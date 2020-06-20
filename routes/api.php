@@ -18,10 +18,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix' => '/v1', 'namespace' => 'Api\V1', 'as' => 'api.'], function () {
-    Route::resource('things_shape_a_lifestyles', 'ThingsShapeALifestyleController', ['except' => ['create', 'edit']]);
-});
+Route::resource('/things', 'ThingsShapeALifestyleController');
 
-//Route::resource('/cruds', 'CrudsController', [
-//    'except' => ['edit', 'show', 'store']
-//]);
+
+Route::resource('/cruds', 'CrudsController', [
+    'except' => ['edit', 'show', 'store']
+]);

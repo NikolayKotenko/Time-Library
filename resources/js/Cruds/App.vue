@@ -17,15 +17,12 @@
 </template>
 
 <script>
-    function Crud({ id, color, name, nk_name}) {
+    function Crud({ id, color, name}) {
         this.id = id;
         this.color = color;
         this.name = name;
-        this.nk_name = nk_name;
     }
-
-    import CrudComponent from './components/CrudComponent';
-
+    import CrudComponent from './components/CrudComponent.vue';
     export default {
         data() {
             return {
@@ -77,7 +74,6 @@
     #app {
         margin-left: 1em;
     }
-
     .heading h1 {
         margin-bottom: 0;
     }

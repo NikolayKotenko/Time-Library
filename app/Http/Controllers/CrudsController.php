@@ -18,9 +18,9 @@ class CrudsController extends Controller
     {
         $crud = new Crud();
         $crud->name = $faker->lexify('????????');
-        $crud->nk_name = 'sdfsdf';
         $crud->color = $faker->boolean ? 'red' : 'green';
         $crud->save();
+
         return response($crud->jsonSerialize(), Response::HTTP_CREATED);
     }
 
@@ -29,6 +29,7 @@ class CrudsController extends Controller
         $crud = Crud::findOrFail($id);
         $crud->color = $request->color;
         $crud->save();
+
         return response(null, Response::HTTP_OK);
     }
 

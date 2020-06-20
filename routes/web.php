@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::view('/companies', 'index');
-
+Route::get('/cruds', function () {
+    return view('/cruds/cruds');
+});
 Route::get('/', function () {
     return view('home');
 });

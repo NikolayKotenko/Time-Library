@@ -5,7 +5,6 @@
         </div>
         <div class="col-2">
             <h3>Name: {{ name | properCase }}</h3>
-            <input type="text" name='nk_name'>
             <select @change="update">
                 <option
                     v-for="col in [ 'red', 'green' ]"
@@ -13,6 +12,7 @@
                     :key="col"
                     :selected="col === color ? 'selected' : ''"
                 >{{ col | properCase }}</option>
+
             </select>
             <button @click="del">Delete</button>
         </div>
@@ -33,7 +33,7 @@
                 this.$emit('delete', this.id);
             }
         },
-        props: ['id', 'color', 'name', 'nk_name'],
+        props: ['id', 'color', 'name'],
         filters: {
             properCase(string) {
                 return string.charAt(0).toUpperCase() + string.slice(1);
@@ -41,4 +41,22 @@
         }
     }
 </script>
-<style></style>
+<style>
+    .crud {
+        display: flex;
+        margin: 1em 1em 1em 0;
+        border: 1px solid #d1d1d1;
+        padding: 1em;
+        max-width: 350px;
+        background-color: white;
+    }
+    .crud img {
+        height: 70px;
+    }
+    .col-2 {
+        margin-left: 1em;
+    }
+    .col-2 > h3 {
+        margin: 0.5em 0;
+    }
+</style>
