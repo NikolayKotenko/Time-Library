@@ -12,7 +12,17 @@ Vue.config.performance = true;
  */
 
 
+Vue.component('example', require('./TimeLibrary/App.vue'));
 
+// import App from './TimeLibrary/App.vue';
+//
+// const app = new Vue({
+//     el: '#app',
+//     components: {
+//         App
+//     },
+//     render: h => h(App)
+// });
 
 
 //Cruds

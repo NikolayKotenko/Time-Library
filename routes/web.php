@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/cruds', function () {
-    return view('/cruds/cruds');
-});
+
 Route::get('/', function () {
     return view('home');
 });
@@ -39,4 +37,9 @@ Route::get('/video-self-dev', function () {
 });
 Route::get('/anime', function () {
     return view('anime');
+});
+
+
+Route::get('/cruds', function () {
+    return view('/cruds/cruds');
 });
