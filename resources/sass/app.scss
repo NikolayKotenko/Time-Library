@@ -1,21 +1,38 @@
-//
-.links{
-    display: grid;
-    grid-template-columns: repeat(8,1fr);
-    grid-column-gap: 5px;
-    a{
-        $border_menu_link: 1px solid lightgrey;
-        grid-template-columns: repeat(8, 1fr);
-        border-right: $border_menu_link;
-        border-left: $border_menu_link;
-        border-top: $border_menu_link;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        padding: 10px 20px;
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
 
-        &:hover{
-            color: white;
-            background: lightgrey;
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+
+
+#app{
+    display: grid;
+    grid-row-gap: 20px;
+    #header{
+        display: grid;
+        grid-row-gap: 20px;
+    }
+    #tags{
+        display: grid;
+        grid-template-columns: repeat(7, auto);
+        font-size: 16px;
+        label{
+            display: grid;
+            grid-template-rows: auto;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            grid-column-gap: 10px;
+            font-size: 1.5em;
+        }
+        @media (max-width: 994px) {
+            &#tags{
+                grid-template-columns: unset;
+            }
         }
     }
+
 }

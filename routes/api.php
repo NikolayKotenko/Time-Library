@@ -19,6 +19,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::resource('/timelibrary', 'TimeLibraryController');
+//Route::group(['prefix' => '/timelibrary'], function () {
+//    Route::post('create', 'TimeLibraryController@create');
+//});
+
+Route::resource('/tag', 'TagController');
 
 
 Route::resource('/cruds', 'CrudsController', [

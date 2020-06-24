@@ -43,3 +43,7 @@ Route::get('/anime', function () {
 Route::get('/cruds', function () {
     return view('/cruds/cruds');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

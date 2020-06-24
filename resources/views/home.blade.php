@@ -1,19 +1,26 @@
-@extends('layouts.header_footer')
-
-@section('title')
-    To-do-diary
-@endsection
+@extends('layouts.app')
 
 @section('content')
-    <h1>Домашняя страница</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Dashboard</div>
 
-    <example>
-        <div id="app">
+                <div class="card-body">
+                    @if (session('status'))
+                        <div class="alert alert-success" role="alert">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    You are logged in!
+                </div>
+            </div>
         </div>
-    </example>
-    <script src="../js/app.js"></script>
+    </div>
+</div>
+
+<div id="app">
+</div>
 @endsection
-
-
-
-

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Crud;
 use App\Models\TimeLibrary;
 use Faker\Generator;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TimeLibraryController extends Controller
 {
@@ -15,13 +15,13 @@ class TimeLibraryController extends Controller
         return response(TimeLibrary::all()->jsonSerialize(), Response::HTTP_OK);
     }
 
-    public function create()
+    public function store(Request $request)
     {
         /* Закончил на добавлении новой записи в основную таблицу */
         $row = new TimeLibrary();
-        $row->name = 'wtf';
-        $row->description = 'desc';
-        $row->tag = 'books';
+        $row->name = $request->input('name');
+        $row->description = $request->input('desc');
+        $row->tag = $request->input('tag');
         $row->save();
 
         return response($row->jsonSerialize(), Response::HTTP_CREATED);
