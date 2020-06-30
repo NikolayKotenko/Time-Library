@@ -10,15 +10,51 @@
                 <input type="radio" :id="tag.id" :value="tag.name" v-model="note.tag"><span>{{tag.name}}</span>
             </label>
         </div>
-        <div>
-            <button @click="create">Add</button>
+
+        <div id="DynamicBlockCalcTime">
+            <div v-if="note.tag === 'films' || note.tag === 'podcasts'" :class="'BlockTime '+note.tag"  >
+                <div class="BlockInputs">
+                    <header>Hours</header>
+                    <input class="form-control" type="number" v-model="">
+                </div>
+                <div class="BlockInputs">
+                    <header>Minutes</header>
+                    <input class="form-control" type="number">
+                </div>
+            </div>
+            <div v-if="note.tag === 'books' || note.tag === 'audio-books'" :class="'BlockTime '+note.tag">
+                <div class="BlockInputs">
+                    <header>Number of pages</header>
+                    <input class="form-control" type="number">
+                </div>
+                <div class="BlockInputs">
+                    <header>Percent</header>
+                    <input class="form-control" type="number">
+                </div>
+            </div>
+            <div v-if="note.tag === 'serials' || note.tag === 'anime'" :class="'BlockTime '+note.tag">
+                <div class="BlockInputs">
+                    <header>Number of Seasons</header>
+                    <input class="form-control" type="number">
+                </div>
+                <div class="BlockInputs">
+                    <header>Hours</header>
+                    <input class="form-control" type="number">
+                </div>
+                <div class="BlockInputs">
+                    <header>Minutes</header>
+                    <input class="form-control" type="number">
+                </div>
+            </div>
         </div>
 
+        <button class="btn btn-outline-success create" @click="create">Add</button>
 <!--        <span>name: {{note.name}}</span>-->
 <!--        <span>desc: {{note.desc}}</span>-->
 <!--        <span>tag: {{note.tag}}</span>-->
     </div>
 </template>
+
 
 
 <script>
@@ -39,6 +75,7 @@
             return {
                 tags: [],
                 note: [],
+
             }
         },
         mounted() {

@@ -22,6 +22,14 @@ class TimeLibraryController extends Controller
         $row->name = $request->input('name');
         $row->description = $request->input('desc');
         $row->tag = $request->input('tag');
+        /*
+        TODO
+            Создать отдельную таблицу "tracking_progress" ИЛИ
+            Создать для каждого тэга отдельную таблицу тех полей которые определяются в теге
+
+                Поля: id_time_library | Hours | Minutes | Number of pages | Percent | Number of Seasons
+            Пушить в неё в те столбцы которые пришли с POST запроса
+        */
         $row->save();
 
         return response($row->jsonSerialize(), Response::HTTP_CREATED);

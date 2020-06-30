@@ -23,10 +23,5 @@
         "sweetalert": "^2.1.2",
         "vue": "^2.5.17",
         "vue-template-compiler": "^2.6.10"
-    },
-    "dependencies": {
-        "vue": "^2.6.11",
-        "vue-axios": "^2.1.5",
-        "vue-router": "^3.3.4"
     }
 }
