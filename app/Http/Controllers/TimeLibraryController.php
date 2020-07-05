@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TimeLibrary;
+use App\Models\TrackingProgressTag;
 use Faker\Generator;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -12,27 +13,33 @@ class TimeLibraryController extends Controller
 {
     public function index()
     {
-        return response(TimeLibrary::all()->jsonSerialize(), Response::HTTP_OK);
+//        return response(TimeLibrary::all()->jsonSerialize(), Response::HTTP_OK);
+        /* Тестирование свящи между таблицами */
+        return $tags = TrackingProgressTag::find(1);
     }
 
     public function store(Request $request)
     {
-        /* Закончил на добавлении новой записи в основную таблицу */
-        $row = new TimeLibrary();
-        $row->name = $request->input('name');
-        $row->description = $request->input('desc');
-        $row->tag = $request->input('tag');
-        /*
-        TODO
-            Создать отдельную таблицу "tracking_progress" ИЛИ
-            Создать для каждого тэга отдельную таблицу тех полей которые определяются в теге
+        /* Добавление новой записи в основную таблицу */
+        $timeLibrary = new TimeLibrary();
+        $timeLibrary->name = $request->name;
+        $timeLibrary->description = $request->desc;
+        $timeLibrary->tag = $request->tag;
+        $timeLibrary->save();
 
-                Поля: id_time_library | Hours | Minutes | Number of pages | Percent | Number of Seasons
-            Пушить в неё в те столбцы которые пришли с POST запроса
-        */
-        $row->save();
+        /* Добавляение записи ослеживания времени по тэгам, записывается через основную таблицу */
+        $trackingProgressTag = new TrackingProgressTag();
+        $trackingProgressTag->minutes = $request->minutes;
+        $trackingProgressTag->hours = $request->hours;
+        $trackingProgressTag->number_of_seasons = $request->number_of_seasons;
+        $trackingProgressTag->series = $request->series;
+        $trackingProgressTag->number_of_pages = $request->number_of_pages;
+        $trackingProgressTag->percent = $request->percent;
+        $trackingProgressTag->total_time_audio_books = $request->total_time_audio_books;
+        $timeLibrary->TrackingProgressTag()->save($trackingProgressTag);
 
-        return response($row->jsonSerialize(), Response::HTTP_CREATED);
+        return response($timeLibrary->jsonSerialize(), Response::HTTP_CREATED);
+//        return response($row3->id);
     }
 
     public function update(Request $request, $id)

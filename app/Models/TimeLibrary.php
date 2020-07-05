@@ -13,8 +13,8 @@ class TimeLibrary extends Model
     {
         return $this->hasOne('App\Models\Tag');
     }
-    public static function wtf()
+    public function TrackingProgressTag()
     {
-        return $tags = TimeLibrary::find(1);
+        return $this->hasOne('App\Models\TrackingProgressTag');
     }
 }

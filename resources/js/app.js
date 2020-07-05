@@ -19,14 +19,39 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+// Vue.component('main-time-library-component', require('./components/MainTimeLibraryComponent.vue').default);
+// Vue.component('tags-component', require('./components/TagsComponent.vue').default);
+// const app = new Vue({
+//     el: '#app',
+// });
 
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+// Vue.prototype.$bus = new Vue(); // Global event bus
 
-const app = new Vue({
-    el: '#app',
+
+import VueRouter from 'vue-router'
+
+Vue.use(VueRouter);
+
+
+import Form_add from './components/FormAddRecord';
+import Form_edit from './components/FormEditRecord';
+
+const router = new VueRouter({
+    mode: 'history',
+    routes: [
+        {
+            path: '/',
+            name: 'add',
+            component: Form_add,
+        },
+        {
+            path: '/edit',
+            name: 'edit',
+            component: Form_edit,
+        },
+    ],
 });
+
+const app = new Vue({ router }).$mount('#app');
+
+import swal from '../assets/js/sweetalert.min';

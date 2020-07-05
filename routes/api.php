@@ -24,6 +24,7 @@ Route::resource('/timelibrary', 'TimeLibraryController');
 //});
 
 Route::resource('/tag', 'TagController');
+Route::resource('/tracking_progress_tag', 'TrackingProgressTagController');
 
 
 Route::resource('/cruds', 'CrudsController', [
