@@ -17,7 +17,7 @@ class CreateTimeLibrariesTable extends Migration
             $table->id();
             $table->text('name');
             $table->text('description');
-            $table->text('tag');
+            $table->text('tag_id');
             $table->timestamps();
         });
     }
