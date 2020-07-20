@@ -8,11 +8,12 @@
                 <textarea class="form-control" v-model="note.desc" cols="30" rows="3" placeholder="description source"></textarea>
             </header>
             <div id="tags">
-                <label :for="tag.id" v-for="tag in tags" v-bind:key="tag.id">
-                    <input type="radio" :id="tag.id" :value="tag.name" v-model="note.tag"><span>{{tag.name}}</span>
+                <label :for="tag.id" v-for="tag in  $store.state.tags" v-bind:key="tag.id">
+                    <input type="radio" :id="tag.id" :value="tag.id" v-model="note.tag"><span>{{tag.name}}</span>
     <!--                В инпуте событие отправляющее по change в bus
                     @change="sendTag(note.tag)"-->
                 </label>
+                {{note.tag}}
             </div>
 
             <div id="DynamicBlockCalcTime">
@@ -92,10 +93,6 @@
         this.desc = desc;
         this.tag = tag;
     }
-    function Tag({ id, name}) {
-        this.id = id;
-        this.name = name;
-    }
     export default {
         components: {
             Navbar
@@ -108,7 +105,9 @@
             }
         },
         mounted() {
-            console.log('Component FormaddRecord mounted.')
+            console.log('Component FormaddRecord mounted.');
+            /* Вызываем заполнение списком тэгов */
+            this.$store.dispatch('listTag');
         },
         methods: {
             async create() {
@@ -141,9 +140,6 @@
                 });
             },
             async read() {
-                const { data } = await window.axios.get('/api/tag');
-                data.forEach(tag => this.tags.push(new Tag(tag)));
-                console.log(data);
             },
             // async update(id, color) {
             //     this.mute = true;

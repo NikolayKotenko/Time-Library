@@ -19,8 +19,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::resource('/timelibrary', 'TimeLibraryController');
+//Route::get('/timelibrary/getColumnForTag{id}', 'TimeLibraryController@getColumnForTag');
 //Route::group(['prefix' => '/timelibrary'], function () {
-//    Route::post('create', 'TimeLibraryController@create');
+//    Route::get('getColumnForTag{id}', 'TimeLibraryController@getColumnForTag');
 //});
 
 Route::resource('/tag', 'TagController');

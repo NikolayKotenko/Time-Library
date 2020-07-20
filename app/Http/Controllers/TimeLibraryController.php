@@ -17,6 +17,14 @@ class TimeLibraryController extends Controller
         /* Тестирование свящи между таблицами */
         return $tags = TrackingProgressTag::find(1);
     }
+    public function show($id)
+    {
+//        return response(TimeLibrary::all()->jsonSerialize(), Response::HTTP_OK);
+        /* Тестирование свящи между таблицами */
+//        return $tags = TrackingProgressTag::find(1);
+
+        return response(TimeLibrary::GetDataForTag($id));
+    }
 
     public function store(Request $request)
     {
@@ -24,7 +32,7 @@ class TimeLibraryController extends Controller
         $timeLibrary = new TimeLibrary();
         $timeLibrary->name = $request->name;
         $timeLibrary->description = $request->desc;
-        $timeLibrary->tag = $request->tag;
+        $timeLibrary->tag_id = $request->tag;
         $timeLibrary->save();
 
         /* Добавляение записи ослеживания времени по тэгам, записывается через основную таблицу */
@@ -47,7 +55,7 @@ class TimeLibraryController extends Controller
         $row = TimeLibrary::findOrFail($id);
         $row->name = $request->name;
         $row->description = $request->description;
-        $row->tag = $request->tag;
+        $row->tag_id = $request->tag;
         $row->save();
 
         return response(null, Response::HTTP_OK);
@@ -58,5 +66,10 @@ class TimeLibraryController extends Controller
         TimeLibrary::destroy($id);
 
         return response(null, Response::HTTP_OK);
+    }
+
+    public function getColumnForTag($id_tag){
+        return 'dad';
+//        return response(TimeLibrary::where('tag_id', '5'));
     }
 }

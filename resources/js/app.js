@@ -28,9 +28,13 @@ window.Vue = require('vue');
 // Vue.prototype.$bus = new Vue(); // Global event bus
 
 
-import VueRouter from 'vue-router'
+import VueRouter from 'vue-router';
+import Vuex from 'vuex';
+import Vuetify from 'vuetify';
 
 Vue.use(VueRouter);
+Vue.use(Vuex);
+Vue.use(Vuetify);
 
 
 import Form_add from './components/FormAddRecord';
@@ -51,7 +55,12 @@ const router = new VueRouter({
         },
     ],
 });
+import store from './store.js';
 
-const app = new Vue({ router }).$mount('#app');
+const app = new Vue({
+    router,
+    store: new Vuex.Store(store),
+    vuetify: new Vuetify(),
+}).$mount('#app');
 
 import swal from '../assets/js/sweetalert.min';
