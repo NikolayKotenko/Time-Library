@@ -31,8 +31,8 @@ class TimeLibraryController extends Controller
         /* Добавление новой записи в основную таблицу */
         $timeLibrary = new TimeLibrary();
         $timeLibrary->name = $request->name;
-        $timeLibrary->description = $request->desc;
-        $timeLibrary->tag_id = $request->tag;
+        $timeLibrary->description = $request->description;
+        $timeLibrary->tag_id = $request->tag_id;
         $timeLibrary->save();
 
         /* Добавляение записи ослеживания времени по тэгам, записывается через основную таблицу */

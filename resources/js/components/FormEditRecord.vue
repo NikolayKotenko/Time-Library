@@ -32,32 +32,27 @@
                                 <span class="headline">{{  }}</span>
                             </v-card-title>
 
+                            <!-- Форма добавления новой позиции -->
                             <v-card-text>
                                 <v-container>
                                     <v-row>
-                                        <v-col cols="12" sm="6" md="4">
-                                            <v-text-field  label="Dessert name"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                            <v-text-field  label="Calories"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                            <v-text-field  label="Fat (g)"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                            <v-text-field  label="Carbs (g)"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" sm="6" md="4">
-                                            <v-text-field label="Protein (g)"></v-text-field>
-                                        </v-col>
+                                        <template v-for="(value_elem, index) in $store.state.defaultItem"
+                                                  v-if="(index !== 'created_at') && (index !== 'updated_at')">
+
+                                            <v-col cols="12" sm="12" md="12">
+                                                <v-select v-if="(index === 'tag_id')" v-model="enabled" :items="$store.state.slots" label="Your Tag" clearable></v-select>
+                                                <v-text-field v-else :label="index" v-model="editedItem[index]"></v-text-field>
+                                            </v-col>
+
+                                        </template>
                                     </v-row>
                                 </v-container>
                             </v-card-text>
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" text @click="">Cancel</v-btn>
-                                <v-btn color="blue darken-1" text @click="">Save</v-btn>
+                                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+                                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
@@ -68,13 +63,21 @@
                     <v-data-table
                         :headers="$store.state.headers_table"
                         :items="$store.state.items_table"
-                        :items-per-page="5"
+                        :items-per-page="10"
                         :sort-by="['tag', 'percent']"
                         :sort-desc="[false, true]"
                         multi-sort
                         :search="$store.state.search"
                         class="elevation-1"
                         >
+                        <!-- Нумерация -->
+                        <template #item="{ item, index, headers }">
+                            <tr>
+                                <td v-for="n in headers">
+                                    {{ n.value === 'id' ? index : item[n.value] }}
+                                </td>
+                            </tr>
+                        </template>
                     </v-data-table>
                 </v-card>
             </v-app>
@@ -106,48 +109,24 @@
         },
         data() {
             return {
+                count: 0,
                 note: [],
                 timetag: [],
                 enabled: null,
                 dialog: false,
                 editedIndex: -1,
+                editedItem: {},
             }
         },
         mounted() {
             console.log('Form edit record mounted.');
-            /* Вызываем заполнение списком тэгов */
-            this.$store.dispatch('listTag');
+
+            /* Вызываем заполнение списком тэгов. Дальше ожидаем ответа (промис) и заполняем по умолчанию нужным тегом */
+            this.$store.dispatch('listTag').then(() => {
+                this.enabled = this.$store.state.slots[2];
+            });
         },
         methods: {
-            async create() {
-                console.log(this.note);
-
-                /* Пишем в основную таблицу */
-                const { data } =
-                    await window.axios.post('/api/timelibrary', {
-                        /* Основная таблица */
-                        name: this.note.name,
-                        desc: this.note.desc,
-                        tag: this.note.tag,
-                        /* Связанная таблица tracking progress */
-                        minutes: this.timetag.minutes,
-                        hours: this.timetag.hours,
-                        number_of_seasons: this.timetag.number_of_seasons,
-                        series: this.timetag.series,
-                        number_of_pages: this.timetag.number_of_pages,
-                        percent: this.timetag.percent,
-                        total_time_audio_books: this.timetag.total_time_audio_books,
-                    });
-                this.note.push(new Note(data));
-
-                /* Алерт */
-                swal({
-                    title: "Row added!",
-                    text: 'Добавлена в базу запись: \n'+data.name+'\n В теги: '+data.tag,
-                    icon: "success",
-                    button: "Aww yiss!",
-                });
-            },
             async read() {
                 // const { data } = await window.axios.get('/api/tag');
                 // data.forEach(tag => this.tags.push(new Tag(tag)));
@@ -176,18 +155,43 @@
                 let min = minutes % 60;
                 return hours + ' Hours ' + min + ' Minutes '
             },
+            editItem (item) {
+                this.editedIndex = this.desserts.indexOf(item);
+                this.editedItem = Object.assign({}, item);
+                this.dialog = true;
+            },
+            deleteItem (item) {
+                const index = this.desserts.indexOf(item);
+                confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+            },
             close () {
                 this.dialog = false;
                 this.$nextTick(() => {
-                    this.editedItem = Object.assign({}, this.defaultItem);
-                    this.editedIndex = -1;
+                    // this.editedItem = Object.assign({}, this.defaultItem)
+                    this.editedIndex = -1
                 })
             },
-            save () {
+            async save () {
                 if (this.editedIndex > -1) {
                     Object.assign(this.desserts[this.editedIndex], this.editedItem)
                 } else {
-                    this.desserts.push(this.editedItem)
+
+                    /* Пишем в основную таблицу */
+                    console.log(this.editedItem);
+                    const { data } =
+                        await window.axios.post('/api/timelibrary', this.editedItem);
+                    console.log(data.tag_id);
+                    /* Перерисуем таблицу */
+                    this.$store.dispatch('FillItemsTable', data.tag_id)
+
+                    /* Алерт */
+                    swal({
+                        title: "Row added!",
+                        text: 'Добавлена в базу запись: \n'+data.name+'\n В теги: '+data.tag,
+                        icon: "success",
+                        button: "Aww yiss!",
+                    });
+
                 }
                 this.close()
             },
@@ -214,13 +218,17 @@
         watch: {
             /* Переключение тэгов в выпадающем списке */
             enabled (slot) {
+                console.log(slot);
                 if (!!slot) {
                     let id_tag = this.$store.state.tags.filter(function (elem) {
                         if (elem.name === slot) {
                             return elem.id;
                         }
                     })[0].id;
-                    this.$store.dispatch('FillItemsTable', id_tag);
+                    this.$store.dispatch('FillItemsTable', id_tag).then(() => {
+                        /* Заполняем локальные данные editedItem*/
+                        this.editedItem = this.$store.state.defaultItem;
+                    });
                 }
                 else {
                     this.$store.state.items_table = [];

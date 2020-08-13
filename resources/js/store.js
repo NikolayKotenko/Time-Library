@@ -18,7 +18,6 @@ let store = {
         ],
         items_table: [],
         /* CRUD */
-        editedItem: [],
         defaultItem: [],
     },
     getters: {
@@ -35,18 +34,20 @@ let store = {
         async FillItemsTable (context, queryParam) {
             const response = await window.axios.get('/api/timelibrary/'+queryParam);
             const headers_table = [];
-            const list_editedItems = [];
+            let list_editedItems = {};
             for (let key in response.data[0]){
                 headers_table.push(new Headers_table_structure(key));
-                list_editedItems.push(new EditedItem(key));
             }
-            console.log( this.editedItem);
+            // console.log(response.data[0]);
+            list_editedItems = new DefaultItem_destruct(response.data[0]);
+
             const data = {
                 'headers_table': headers_table,
+                'defaultItem': list_editedItems,
                 'items_table': response.data,
             };
             // const arr_tag_name = response.data.map(tag => tag.name);
-            context.commit('FILL_ITEMS_TABLE', data)
+            context.commit('FILL_ITEMS_TABLE', data);
         },
     },
     mutations: {
@@ -57,10 +58,9 @@ let store = {
         FILL_ITEMS_TABLE(state, payload) {
             state.headers_table = payload.headers_table;
             state.items_table = payload.items_table;
-        },
-        FILL_EDITED_ITEMS_TABLE(state, payload){
 
-        }
+            state.defaultItem = payload.defaultItem;
+        },
         // myMutation (state, myDataObject) {
         //     state.myData = myDataObject
         // }
@@ -72,8 +72,41 @@ function Headers_table_structure(header) {
     this.text = header;
     this.value = header;
 }
-function EditedItem(header) {
-    header = '';
+function DefaultItem_destruct({name, description, tag_id, minutes, number_of_seasons,
+                        series, number_of_pages, percent, total_time_audio_books, created_at, updated_at, id}) {
+    if (tag_id) {
+        this.tag_id = tag_id;
+    }
+    if (name) {
+        this.name = '';
+    }
+    if (description) {
+        this.description = '';
+    }
+    if (minutes) {
+        this.minutes = 0;
+    }
+    if (number_of_seasons) {
+        this.number_of_seasons = 0;
+    }
+    if (series) {
+        this.series = 0;
+    }
+    if (number_of_pages) {
+        this.number_of_pages = 0;
+    }
+    if (percent) {
+        this.percent = 0;
+    }
+    if (total_time_audio_books) {
+        this.total_time_audio_books = 0;
+    }
+    if (created_at) {
+        this.created_at = '';
+    }
+    if (updated_at) {
+        this.updated_at = '';
+    }
 }
 
 export default store;
