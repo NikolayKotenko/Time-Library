@@ -32,12 +32,12 @@
                                 <span class="headline">{{  }}</span>
                             </v-card-title>
 
-                            <!-- Форма добавления новой позиции -->
+                            <!-- Форма добавления / редактирования позиции -->
                             <v-card-text>
                                 <v-container>
                                     <v-row>
                                         <template v-for="(value_elem, index) in $store.state.defaultItem"
-                                                  v-if="(index !== 'created_at') && (index !== 'updated_at')">
+                                                  v-if="(index !== 'created_at') && (index !== 'updated_at') && (index !== 'id')">
 
                                             <v-col cols="12" sm="12" md="12">
                                                 <v-select v-if="(index === 'tag_id')" v-model="enabled" :items="$store.state.slots" label="Your Tag" clearable></v-select>
@@ -52,7 +52,7 @@
                             <v-card-actions>
                                 <v-spacer></v-spacer>
                                 <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+                                <v-btn color="blue darken-1" text @click="save_update">Save</v-btn>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
@@ -70,13 +70,33 @@
                         :search="$store.state.search"
                         class="elevation-1"
                         >
-                        <!-- Нумерация -->
-                        <template #item="{ item, index, headers }">
+                        <!-- Меняем заголовок -->
+                        <template v-slot:header.tag_id="{ headers }">
+                            <span>tag_name</span>
+                        </template>
+
+                        <!-- Меняем данные в таблице идшник тэга на наименование -->
+                        <template v-slot:item.tag_id="{ item }">
                             <tr>
-                                <td v-for="n in headers">
-                                    {{ n.value === 'id' ? index : item[n.value] }}
-                                </td>
+                                <td>{{ get_tagname_for_id(item.tag_id) }}</td>
                             </tr>
+                        </template>
+
+                        <!-- Добавляем колонку с кнопками редактирования -->
+                        <template v-slot:item.actions="{ item }">
+                            <v-icon
+                                small
+                                class="mr-2"
+                                @click="editItem(item)"
+                            >
+                                mdi-pencil
+                            </v-icon>
+                            <v-icon
+                                small
+                                @click="deleteItem(item)"
+                            >
+                                mdi-delete
+                            </v-icon>
                         </template>
                     </v-data-table>
                 </v-card>
@@ -109,7 +129,6 @@
         },
         data() {
             return {
-                count: 0,
                 note: [],
                 timetag: [],
                 enabled: null,
@@ -155,45 +174,86 @@
                 let min = minutes % 60;
                 return hours + ' Hours ' + min + ' Minutes '
             },
+            get_tagname_for_id(tag_id){
+                return this.$store.state.tags.filter((elem) => elem.id == tag_id)[0].name;
+            },
             editItem (item) {
-                this.editedIndex = this.desserts.indexOf(item);
+                // console.log(item);
+                this.editedIndex = this.$store.state.items_table.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.dialog = true;
             },
             deleteItem (item) {
-                const index = this.desserts.indexOf(item);
-                confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+                const index = this.$store.state.items_table.indexOf(item);
+                confirm('Are you sure you want to delete this item?') && this.delete_row(item)
             },
             close () {
                 this.dialog = false;
                 this.$nextTick(() => {
-                    // this.editedItem = Object.assign({}, this.defaultItem)
+                    this.editedItem = Object.assign({}, this.$store.state.defaultItem)
                     this.editedIndex = -1
                 })
             },
-            async save () {
+            async save_update () {
+                // console.log(this.editedIndex);
+                /* Если выбранный индекс не отрицательный (выбрана позиция на редактирование),
+                 тогда сольем объекты и получим обновленные данные, потому что реактивно и показываются из items_table */
+                /* Обновление выбранной позиции */
                 if (this.editedIndex > -1) {
-                    Object.assign(this.desserts[this.editedIndex], this.editedItem)
-                } else {
+                    Object.assign(this.$store.state.items_table[this.editedIndex], this.editedItem);
 
+                    const upd_item = this.editedItem;
+                    const id_item = this.$store.state.items_table[this.editedIndex].id;
+                    // console.log(this.editedItem);
+                    // console.log(this.$store.state.items_table[this.editedIndex].id);
                     /* Пишем в основную таблицу */
-                    console.log(this.editedItem);
-                    const { data } =
+                    const {data} = await window.axios.put('/api/timelibrary/' + id_item, upd_item);
+                    // console.log(data);
+                    /* Перерисуем таблицу */
+                    this.$store.dispatch('FillItemsTable', data.tag_id)
+
+                    /* Алерт */
+                    swal({
+                        title: "Row updated!",
+                        text: 'Обновлена запись: \n' + data.name + '\n В теги: ' + this.get_tagname_for_id(data.tag_id),
+                        icon: "success",
+                        button: "Aww yiss!",
+                    });
+                }
+                /* Добавление новой позиции */
+                else {
+                    /* Пишем в основную таблицу */
+                    // console.log(this.editedItem);
+                    const {data} =
                         await window.axios.post('/api/timelibrary', this.editedItem);
-                    console.log(data.tag_id);
+                    // console.log(data);
                     /* Перерисуем таблицу */
                     this.$store.dispatch('FillItemsTable', data.tag_id)
 
                     /* Алерт */
                     swal({
                         title: "Row added!",
-                        text: 'Добавлена в базу запись: \n'+data.name+'\n В теги: '+data.tag,
+                        text: 'Добавлена в базу запись: \n' + data.name + '\n В теги: ' + this.get_tagname_for_id(data.tag_id),
                         icon: "success",
                         button: "Aww yiss!",
                     });
-
                 }
                 this.close()
+            },
+            async delete_row(item){
+                // console.log(item);
+                // this.$store.state.items_table.splice(index, 1)
+                const {data} = await window.axios.delete('/api/timelibrary/' + item.id);
+                // console.log(data);
+                /* Перерисуем таблицу */
+                this.$store.dispatch('FillItemsTable', item.tag_id)
+                /* Алерт */
+                swal({
+                    title: "Row deleted!",
+                    text: 'Удалена из базы запись: \n' + item   .name + '\n с тегом: ' + this.get_tagname_for_id(item.tag_id),
+                    icon: "success",
+                    button: "Aww yiss!",
+                });
             },
         },
         computed:{
@@ -218,7 +278,7 @@
         watch: {
             /* Переключение тэгов в выпадающем списке */
             enabled (slot) {
-                console.log(slot);
+                // console.log(slot);
                 if (!!slot) {
                     let id_tag = this.$store.state.tags.filter(function (elem) {
                         if (elem.name === slot) {

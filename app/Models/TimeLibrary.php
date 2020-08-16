@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Log;
 
 class TimeLibrary extends Model
 {
+    protected $fillable = [
+        'name', 'description', 'tag_id',
+    ];
 //    protected $fillable = ['name'];
 //    protected $guarded = [];
 

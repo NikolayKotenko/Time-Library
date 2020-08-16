@@ -7,6 +7,7 @@ use App\Models\TrackingProgressTag;
 use Faker\Generator;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TimeLibraryController extends Controller
@@ -15,7 +16,16 @@ class TimeLibraryController extends Controller
     {
 //        return response(TimeLibrary::all()->jsonSerialize(), Response::HTTP_OK);
         /* Тестирование свящи между таблицами */
-        return $tags = TrackingProgressTag::find(1);
+//        $data_tm = DB::table('time_libraries')->lists('id');
+
+//        $a = new $data_tm;
+//        $a->getTableColumns();
+//        $resp= [];
+//        while($row = mysqli_fetch_array($data_tm)) {
+//            $resp[$row['Field']] = '';
+//        }
+//        return $data_tm;
+//        return $tags = TrackingProgressTag::find(1);
     }
     public function show($id)
     {
@@ -29,22 +39,18 @@ class TimeLibraryController extends Controller
     public function store(Request $request)
     {
         /* Добавление новой записи в основную таблицу */
-        $timeLibrary = new TimeLibrary();
-        $timeLibrary->name = $request->name;
-        $timeLibrary->description = $request->description;
-        $timeLibrary->tag_id = $request->tag_id;
-        $timeLibrary->save();
+        $timeLibrary = TimeLibrary::create($request->all());
 
         /* Добавляение записи ослеживания времени по тэгам, записывается через основную таблицу */
-        $trackingProgressTag = new TrackingProgressTag();
-        $trackingProgressTag->minutes = $request->minutes;
-        $trackingProgressTag->hours = $request->hours;
-        $trackingProgressTag->number_of_seasons = $request->number_of_seasons;
-        $trackingProgressTag->series = $request->series;
-        $trackingProgressTag->number_of_pages = $request->number_of_pages;
-        $trackingProgressTag->percent = $request->percent;
-        $trackingProgressTag->total_time_audio_books = $request->total_time_audio_books;
-        $timeLibrary->TrackingProgressTag()->save($trackingProgressTag);
+        $timeLibrary->TrackingProgressTag()->create($request->only([
+            'minutes',
+            'hours',
+            'number_of_seasons',
+            'series',
+            'number_of_pages',
+            'percent',
+            'total_time_audio_books',
+        ]));
 
         return response($timeLibrary->jsonSerialize(), Response::HTTP_CREATED);
 //        return response($row3->id);
@@ -52,24 +58,37 @@ class TimeLibraryController extends Controller
 
     public function update(Request $request, $id)
     {
-        $row = TimeLibrary::findOrFail($id);
-        $row->name = $request->name;
-        $row->description = $request->description;
-        $row->tag_id = $request->tag;
-        $row->save();
+        $timeLibrary = TimeLibrary::findOrFail($id);
+        $timeLibrary->fill($request->all());
 
-        return response(null, Response::HTTP_OK);
+        /* Добавляение записи ослеживания времени по тэгам, записывается через основную таблицу */
+        $timeLibrary->TrackingProgressTag->fill($request->only([
+            'minutes',
+            'hours',
+            'number_of_seasons',
+            'series',
+            'number_of_pages',
+            'percent',
+            'total_time_audio_books',
+        ]));
+        /* Сохраняем данные в 2 таблицах (связанная тоже сохраняется) */
+        $timeLibrary->push();
+
+        return response($timeLibrary->jsonSerialize(), Response::HTTP_OK);
     }
 
     public function destroy($id)
     {
-        TimeLibrary::destroy($id);
+        $timeLibrary = TimeLibrary::findOrFail($id);
+        $timeLibrary->TrackingProgressTag()->delete();
+        $timeLibrary->delete();
 
-        return response(null, Response::HTTP_OK);
+        return response($id, Response::HTTP_OK);
     }
 
-    public function getColumnForTag($id_tag){
-        return 'dad';
+    public function getColumnForTag(){
+
+        return 'hhhhh';
 //        return response(TimeLibrary::where('tag_id', '5'));
     }
 }

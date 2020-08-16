@@ -4,26 +4,26 @@ let store = {
         /* Select Tag */
         slots: [],
         /* Table */
-        headers_table: [
-            { text: 'name', align: 'start', sortable: false, value: 'name',},
-            { text: 'description', value: 'description' },
-            { text: 'tag', value: 'tag' },
-            { text: 'minutes', value: 'minutes' },
-            { text: 'hours', value: 'hours' },
-            { text: 'number of seasons', value: 'number_of_seasons' },
-            { text: 'series', value: 'series' },
-            { text: 'number of pages', value: 'number_of_pages' },
-            { text: 'percent', value: 'percent' },
-            { text: 'total time audio books', value: 'total_time_audio_books' },
-        ],
+        headers_table: [],
         items_table: [],
         /* CRUD */
         defaultItem: [],
+        /* Описываем поля которые должны отрисовываться в таблице */
+        CommonFieldTags: ['created_at', 'updated_at', 'name', 'description'],
+        CustomFieldTags: {
+            'films': ['minutes', 'hours'],
+            'podcasts': ['minutes', 'hours'],
+            'video-self-dev': ['minutes', 'hours'],
+            'audio-books': ['percent', 'total_time_audio_books'],
+            'books': ['percent', 'number_of_pages'],
+            'serials': ['number_of_seasons', 'series', 'minutes'],
+            'anime': ['number_of_seasons', 'series', 'minutes'],
+        },
     },
     getters: {
         tag_name : state => {
             return state.tags.name
-        }
+        },
     },
     actions: {
         async listTag (context) {
@@ -31,19 +31,43 @@ let store = {
             // const arr_tag_name = response.data.map(tag => tag.name);
             context.commit('ADD_TAG_TO_LIST', response.data)
         },
-        async FillItemsTable (context, queryParam) {
-            const response = await window.axios.get('/api/timelibrary/'+queryParam);
-            const headers_table = [];
-            let list_editedItems = {};
-            for (let key in response.data[0]){
-                headers_table.push(new Headers_table_structure(key));
+        async FillItemsTable (context, tag_id) {
+            const response = await window.axios.get('/api/timelibrary/'+tag_id);
+            let headers_table = [];
+            let defaultItem = {};
+
+            /* Найдем имя тега чтобы найти структуру по описанию */
+            const name_tag = context.state.tags.filter((elem) => elem.id == tag_id)[0].name;
+            // console.log(name_tag);
+
+            /* Заполним первым тэг id, чтобы в объекте был на 1 строчке*/
+            defaultItem['tag_id'] = tag_id;
+
+            /* Общими полями заполняем объект */
+            for (let key in context.state.CommonFieldTags) {
+                const value = context.state.CommonFieldTags[key];
+                headers_table.push(new Headers_table_structure(value));
+                defaultItem[value] = '';
             }
-            // console.log(response.data[0]);
-            list_editedItems = new DefaultItem_destruct(response.data[0]);
+            /* Кастомные поля для каждого тэга */
+            for (let key in context.state.CustomFieldTags){
+                const value = context.state.CustomFieldTags[key];
+                if (key === name_tag) {
+                    value.forEach((elem) => {
+                        headers_table.push(new Headers_table_structure(elem));
+                            defaultItem[elem] = '';
+                    });
+                }
+            }
+            /* Кнопки действия в конце таблицы расположим */
+            headers_table.push({'text': 'actions', 'value': 'actions', 'width': '80px', 'sortable': false});
+
+            console.log(headers_table);
+            console.log(defaultItem);
 
             const data = {
                 'headers_table': headers_table,
-                'defaultItem': list_editedItems,
+                'defaultItem': defaultItem,
                 'items_table': response.data,
             };
             // const arr_tag_name = response.data.map(tag => tag.name);
@@ -69,44 +93,14 @@ let store = {
 
 /* Вспомогательная ф-я конструктор */
 function Headers_table_structure(header) {
+    if (header === 'updated_at' || header === 'created_at') {
+        this.width = '120px';
+    }
+    if (header === 'name') {
+        this.width = '250px';
+    }
     this.text = header;
     this.value = header;
-}
-function DefaultItem_destruct({name, description, tag_id, minutes, number_of_seasons,
-                        series, number_of_pages, percent, total_time_audio_books, created_at, updated_at, id}) {
-    if (tag_id) {
-        this.tag_id = tag_id;
-    }
-    if (name) {
-        this.name = '';
-    }
-    if (description) {
-        this.description = '';
-    }
-    if (minutes) {
-        this.minutes = 0;
-    }
-    if (number_of_seasons) {
-        this.number_of_seasons = 0;
-    }
-    if (series) {
-        this.series = 0;
-    }
-    if (number_of_pages) {
-        this.number_of_pages = 0;
-    }
-    if (percent) {
-        this.percent = 0;
-    }
-    if (total_time_audio_books) {
-        this.total_time_audio_books = 0;
-    }
-    if (created_at) {
-        this.created_at = '';
-    }
-    if (updated_at) {
-        this.updated_at = '';
-    }
 }
 
 export default store;
