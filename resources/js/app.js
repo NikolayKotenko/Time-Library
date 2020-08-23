@@ -45,12 +45,7 @@ const router = new VueRouter({
     routes: [
         {
             path: '/',
-            name: 'add',
-            component: Form_add,
-        },
-        {
-            path: '/edit',
-            name: 'edit',
+            name: 'table',
             component: Form_edit,
         },
     ],

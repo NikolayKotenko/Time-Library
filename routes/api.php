@@ -32,6 +32,6 @@ Route::resource('/tag', 'TagController');
 Route::resource('/tracking_progress_tag', 'TrackingProgressTagController');
 
 
-Route::resource('/cruds', 'CrudsController', [
-    'except' => ['edit', 'show', 'store']
-]);
+//Route::resource('/cruds', 'CrudsController', [
+//    'except' => ['edit', 'show', 'store']
+//]);

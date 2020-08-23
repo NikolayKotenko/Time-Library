@@ -16,13 +16,13 @@ class CreateTrackingProgressTagTable extends Migration
         Schema::create('tracking_progress_tags', function (Blueprint $table) {
             $table->id();
             $table->integer('time_library_id');
-            $table->integer('minutes');
-            $table->integer('hours');
-            $table->integer('number_of_seasons');
-            $table->integer('series');
-            $table->integer('number_of_pages');
-            $table->integer('percent');
-            $table->integer('total_time_audio_books');
+            $table->integer('minutes')->nullable();
+            $table->integer('hours')->nullable();
+            $table->integer('number_of_seasons')->nullable();
+            $table->integer('series')->nullable();
+            $table->integer('number_of_pages')->nullable();
+            $table->integer('percent')->nullable();
+            $table->integer('total_time_audio_books')->nullable();
             $table->timestamps();
         });
     }

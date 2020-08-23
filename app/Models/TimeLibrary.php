@@ -50,6 +50,6 @@ class TimeLibrary extends Model
             $time_libraries->addSelect('tracking_progress_tags.number_of_seasons', 'tracking_progress_tags.series', 'tracking_progress_tags.minutes');
         }
 
-        return $time_libraries->get();
+            return $time_libraries->get();
     }
 }
